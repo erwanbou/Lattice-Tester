@@ -31,6 +31,13 @@
 #include "latticetester/Reducer.h"
 
 #ifdef WITH_NTL
+#include <NTL/tools.h>
+#include <NTL/ZZ.h>
+#include <NTL/matrix.h>
+#include "NTL/vec_ZZ.h"
+#include <NTL/vec_vec_ZZ.h>
+#include <NTL/mat_ZZ.h>
+#include <NTL/LLL.h>
 #else
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -289,7 +296,7 @@ bool Reducer::calculCholeski (RVect & DC2, RMat & C0)
    conv (m2r, m_lat->getM2 ());
    d = dim / 2 + 1;
    // Calcul des d premieres lignes de C0 via la base primale.
-   for (i = 1; i <= d; i++) {
+   for (i = 1; i <= dim; i++) {
       m_lat->getPrimalBasis ().updateScalL2Norm (i);
       for (j = i; j <= dim; j++) {
          if (j == i)
@@ -311,7 +318,7 @@ bool Reducer::calculCholeski (RVect & DC2, RMat & C0)
             C0(i,j) = m_c2(i,j) / DC2[i];
       }
    }
-
+   /*
    // Calcul des m_lat->dim-d dernieres lignes de C0 via la base duale.
    for (i = dim; i > d; i--)
    {
@@ -341,7 +348,7 @@ bool Reducer::calculCholeski (RVect & DC2, RMat & C0)
             C0(i,j) -= C0(k,i) * C0(k,j);
          }
       }
-   }
+   } */
    return true;
 }
 
@@ -510,6 +517,7 @@ void Reducer::preRedDieter (int d)
    m_cpt = 0;
    m_countDieter = 0;
    BoundCount = 2 * dim - d;
+
    do {
       pairwiseRedPrimal (i, d);
       if (i > d)
@@ -523,6 +531,63 @@ void Reducer::preRedDieter (int d)
     // trace( "APRES preRedDieter");
 }
 
+//=========================================================================
+
+void Reducer::preRedDieterPrimalOnly (int d)
+{
+    // trace( "AVANT preRedDieter");
+   long BoundCount;
+   const int dim = m_lat->getDim ();
+
+   m_lat->getPrimalBasis().updateScalL2Norm (d+1, dim);
+   m_lat->getDualBasis ().updateScalL2Norm (d+1, dim);
+   m_lat->sort (d);
+   int i = dim;
+   m_cpt = 0;
+   m_countDieter = 0;
+   BoundCount = 2 * dim - d;
+   do {
+      pairwiseRedPrimal (i, d);
+      //if (i > d)
+      //   pairwiseRedDual (i);
+      if (i <= 1)
+         i = dim;
+      else
+         --i;
+   } while (!(m_countDieter >= BoundCount || m_cpt > MAX_PRE_RED)); // fred
+
+    // trace( "APRES preRedDieter");
+}
+
+
+//=========================================================================
+
+void Reducer::preRedDieterPrimalOnlyRandomized (int d)
+{
+    // trace( "AVANT preRedDieter");
+   long BoundCount;
+   const int dim = m_lat->getDim ();
+
+   m_lat->getPrimalBasis().updateScalL2Norm (d+1, dim);
+   m_lat->getDualBasis ().updateScalL2Norm (d+1, dim);
+   m_lat->sort (d);
+   int i = dim;
+   m_cpt = 0;
+   m_countDieter = 0;
+   BoundCount = 2 * dim - d;
+
+   do {
+
+       pairwiseRedPrimal ((rand() % dim) + 1, d);
+      
+      if (i <= 1)
+         i = dim;
+      else
+         --i;
+   } while (!(m_countDieter >= BoundCount || m_cpt > MAX_PRE_RED)); // fred
+
+    // trace( "APRES preRedDieter");
+}
 
 //=========================================================================
 
@@ -676,6 +741,32 @@ void Reducer::redLLL (double fact, long maxcpt, int Max)
    m_lat->getDualBasis ().setNegativeNorm (true);
 }
 
+//=========================================================================
+
+void Reducer::redLLLNTLProxy (double fact)
+{
+   // floating point variant faster than exact arithmetic value
+   LLL_XD (m_lat->getPrimalBasis(), fact, 0, 0, 0);
+
+}
+
+void Reducer::redLLLNTLExact (MScal& det2, long a, long b)
+{
+   // exact arithmetic version
+   LLL (det2, m_lat->getPrimalBasis(), a, b, 0);
+
+}
+
+
+void Reducer::redBKZ (double fact, long insertionSize)
+{
+   BKZ_XD (m_lat->getPrimalBasis(), fact, insertionSize);
+
+   /*long 
+   [G_]BKZ_{FP,QP,QP1,XD,RR} (mat_ZZ& B, [ mat_ZZ& U, ] double delta=0.99,
+                             long BlockSize=10, long prune=0, 
+                             LLLCheckFct check = 0, long verbose = 0);*/
+}
 
 //=========================================================================
 

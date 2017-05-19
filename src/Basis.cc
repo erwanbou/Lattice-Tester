@@ -363,16 +363,17 @@ string Basis::toString(int i) const
 
 void Basis::write () const
 {
-   cout << "Dim = " << m_dim << " \n";
+   //cout << "Dim = " << m_dim << " \n";
    for (int i = 1; i <= m_dim; i++) {
-      cout << "   | ";
+      cout << "[";
       for (int j = 1; j <= m_dim; j++) {
-         cout << setprecision (15) << (*this)(i,j) << "\t";
+         cout << setprecision (15) << (*this)(i,j) << " ";
       }
-      cout << " |" << endl;
+      cout << "]" << endl;
    }
    // return;
-   cout << "Norm:\n";
+   
+   /*cout << "Norm:\n";
 
    for (int i = 1; i <= m_dim; i++) {
       cout << "   ";
@@ -383,7 +384,8 @@ void Basis::write () const
       } else {
          cout << m_vecNorm[i] << endl;
       }
-   }
+   }*/
+
    cout << endl;
 }
 

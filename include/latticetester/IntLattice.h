@@ -92,6 +92,11 @@ public:
    void copy (const IntLattice & lattice);
 
    /**
+   * to print both primal and dual basis
+   */
+   void write() const;
+
+   /**
     * Returns actual dimension `Dim`.
     */
    int getDim () const { return m_v.getDim(); }

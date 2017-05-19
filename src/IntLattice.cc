@@ -567,4 +567,39 @@ void IntLattice::buildProjection (const Coordinates & proj)
 
 }
 
+
+void IntLattice::write () const
+{
+   int dim = m_v.getDim();
+
+   for (int i = 1; i <= dim; i++) {
+
+      // Primal lattice
+      cout << "[";
+      for (int j = 1; j <= dim; j++) {
+         cout << setprecision (15) << m_v[i][j] << " ";
+      }
+      cout << "]     ";
+
+      // Dual lattice
+      cout << "[";
+      for (int j = 1; j <= dim; j++) {
+         cout << setprecision (15) << m_w[i][j] << " ";
+      }
+      cout << "]" << endl;
+
+   }
+
+   cout << "\nPrimal";
+   //cout << "   Dual";
+   cout << endl;
+   for (int j = 1; j < dim+1; j++){
+      cout << m_v.getVecNorm(j);
+      //cout << "   " << m_w.getVecNorm(j);
+      cout << endl;
+   }
+
+   cout << endl;
+}
+
 } //namespace LatticeTester
