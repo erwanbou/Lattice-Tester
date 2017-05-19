@@ -1,7 +1,12 @@
 //
-//  main.cpp
+//  main.cc
 //  Lattice Tester
-// 
+//
+//  Source code to perform test on running time and
+//  length of shortest vector in the basis.
+//  To be used with the latest version of the latticetester
+//  code on the branch test_LLL_branch.
+//
 
 #include <iostream>
 #include <iomanip>
